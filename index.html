@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GraphQL Profile</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Login Section -->
+    <div id="login-section" class="container">
+      <div class="login-box">
+        <h1>Login to Your Profile</h1>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username">Username or Email</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              placeholder="Enter username or email"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              placeholder="Enter password"
+            />
+          </div>
+          <div id="error-message" class="error"></div>
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profile-section" style="display: none">
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="navbar-brand">GraphQL</div>
+        <button id="logout-btn" class="btn-secondary">Logout</button>
+      </nav>
+
+      <!-- Welcome Message -->
+      <div class="welcome-section">
+        <h1 class="welcome-text">Welcome, <span id="user-login"></span></h1>
+      </div>
+
+      <!-- Main Content Container -->
+      <div class="container">
+        <div class="info-grid">
+          <!-- Basic User Info -->
+          <div class="info-card">
+            <h2>User Information</h2>
+            <div class="info-item">
+              <span class="label">User ID:</span>
+              <span id="user-id" class="value"></span>
+            </div>
+            <div class="info-item">
+              <span class="label">Login:</span>
+              <span id="user-login-display" class="value"></span>
+            </div>
+          </div>
+
+          <!-- XP Card -->
+          <div class="info-card highlight">
+            <h2>Total XP</h2>
+            <div class="xp-amount" id="total-xp">0</div>
+            <p class="subtitle">Experience Points Earned</p>
+          </div>
+
+          <!-- Audit Ratio Card -->
+          <div class="info-card">
+            <h2>Audit Ratio</h2>
+            <div class="ratio-display">
+              <span id="audit-ratio" class="ratio-value">0.00</span>
+            </div>
+            <div class="audit-details">
+              <div class="info-item">
+                <span class="label">Audits Done:</span>
+                <span id="audits-done" class="value">0</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Audits Received:</span>
+                <span id="audits-received" class="value">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="projects-section">
+          <h2>Recent Projects</h2>
+          <div id="projects-list" class="projects-list"></div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="statistics-section">
+          <h2>Statistics & Graphs</h2>
+          <div class="graphs-container">
+            <!-- Graph 1: XP Over Time -->
+            <div class="graph-card">
+              <h3>XP Progress Over Time</h3>
+              <div id="xp-graph" class="graph-container"></div>
+            </div>
+
+            <!-- Graph 2: Audit Ratio Visualization -->
+            <div class="graph-card">
+              <h3>Audit Ratio Breakdown</h3>
+              <div id="audit-graph" class="graph-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/index.js"></script>
+  </body>
+</html>
