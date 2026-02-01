@@ -97,6 +97,21 @@ function showProfile() {
     loadProfileData();
 }
 
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+
+    const isNegative = bytes < 0;
+    const absBytes = Math.abs(bytes);
+
+    const k = 1000; // Use decimal
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(absBytes) / Math.log(k));
+
+    const value = Math.round(absBytes / Math.pow(k, i) * 100) / 100;
+    return (isNegative ? '-' : '') + value + ' ' + sizes[i];
+}
+
 // ==================== GRAPHQL QUERIES ====================
 
 async function fetchGraphQL(query) {
@@ -148,12 +163,21 @@ async function loadProfileData() {
         }
     }`;
 
-    // Query 2: XP transactions
+    // Query 2: XP transactions (exclude exercise XP)
     const xpQuery = `{
-        transaction(where: {type: {_eq: "xp"}}) {
+        transaction(
+            where: {
+                type: {_eq: "xp"}
+                object: {type: {_neq: "exercise"}}
+            }
+        ) {
             amount
             createdAt
             path
+            object {
+                type
+                name
+            }
         }
     }`;
 
@@ -195,7 +219,7 @@ async function loadProfileData() {
         // Calculate and display total XP
         if (xpData && xpData.transaction) {
             const totalXP = xpData.transaction.reduce((sum, t) => sum + t.amount, 0);
-            document.getElementById('total-xp').textContent = totalXP.toLocaleString();
+            document.getElementById('total-xp').textContent = formatBytes(totalXP);
 
             // Store XP data for graph
             window.xpData = xpData.transaction;
@@ -365,6 +389,8 @@ function createXPGraph() {
     path.setAttribute("fill", "none");
     svg.appendChild(path);
 
+    const tooltip = document.getElementById('graph-tooltip');
+
     cumulativeData.forEach(d => {
         const x = padding + (d.date - minDate) / dateRange * graphWidth;
         const y = height - padding - (d.xp / maxXP) * graphHeight;
@@ -376,9 +402,28 @@ function createXPGraph() {
         circle.setAttribute("fill", "#00d9ff");
         circle.setAttribute("class", "graph-point");
 
-        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-        title.textContent = `Date: ${d.date.toLocaleDateString()}\nTotal XP: ${d.xp.toLocaleString()}\nGained: +${d.amount}`;
-        circle.appendChild(title);
+        // Add tooltip
+        circle.addEventListener('mouseenter', () => {
+            const isPositive = d.amount >= 0;
+            const gainedLabel = isPositive ? 'Gained' : 'Lost';
+            const gainedSign = isPositive ? '+' : '';
+            const gainedClass = isPositive ? 'tooltip-gained' : 'tooltip-lost';
+            tooltip.innerHTML = `
+                <div class="tooltip-date">${d.date.toLocaleDateString()}</div>
+                <div class="tooltip-xp">Total XP: ${formatBytes(d.xp)}</div>
+                <div class="${gainedClass}">${gainedLabel}: ${gainedSign}${formatBytes(d.amount)}</div>
+            `;
+            tooltip.classList.add('visible');
+        });
+
+        circle.addEventListener('mousemove', (e) => {
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+        });
+
+        circle.addEventListener('mouseleave', () => {
+            tooltip.classList.remove('visible');
+        });
 
         svg.appendChild(circle);
     });
